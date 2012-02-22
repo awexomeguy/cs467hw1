@@ -27,7 +27,6 @@ public class PointerTree extends TreeStructure
 					phoneNumbers.add(j);
 				
 				node.setUserObject(phoneNumbers);
-				System.out.println("found a leaf");
 			}
 		}
 	}
@@ -74,7 +73,9 @@ public class PointerTree extends TreeStructure
 	// number in question
 	public DefaultMutableTreeNode call(DefaultMutableTreeNode startingNode, int phoneNumber)
 	{
+		System.out.println("a phone in " + startingNode + " wants to call " + phoneNumber);
 		System.out.println("starting call at: " + startingNode);
+		
 		// first search the same cell, if found then just return the local cell
 		ArrayList localNumbers = (ArrayList)startingNode.getUserObject();
 		if(localNumbers.contains(phoneNumber))
@@ -118,5 +119,84 @@ public class PointerTree extends TreeStructure
 		// this is just because java wants a return statement at the
 		// end of a function
 		return null;
+	}
+	
+	// this will move a phone number from its current cell to
+	// a given destination cell
+	public boolean move(int phoneNumber, DefaultMutableTreeNode source, DefaultMutableTreeNode dest)
+	{
+		ArrayList list;
+		HashMap map;
+		
+		// check that the number is in source. If it is not
+		// in source, do not proceed with the move
+		list = (ArrayList)source.getUserObject();
+		if(!list.contains(phoneNumber))
+			return false;
+			
+		// if source and dest are the same node, no need to move
+		// (considerred a successful move)
+		if(source == dest)
+			return true;
+	
+		DefaultMutableTreeNode leastCommonAncestor = (DefaultMutableTreeNode)source.getSharedAncestor(dest);
+			
+		// delete pointers between source and leastCommonAncestor
+		DefaultMutableTreeNode currentNode;
+		Enumeration e = source.pathFromAncestorEnumeration(leastCommonAncestor);
+		
+		while(e.hasMoreElements())
+		{
+			currentNode = (DefaultMutableTreeNode)e.nextElement();
+			System.out.println("removing " + phoneNumber + " from " + currentNode);
+			
+			if(currentNode.isLeaf())
+			{
+				list = (ArrayList)currentNode.getUserObject();
+				list.remove(list.indexOf(phoneNumber)); 
+			}
+			else
+			{
+				map = (HashMap)currentNode.getUserObject();
+				map.remove(phoneNumber);
+			}
+		}
+		
+		// add pointers between dest and leastCommonAncestor
+		e = dest.pathFromAncestorEnumeration(leastCommonAncestor);
+		
+		while(e.hasMoreElements())
+		{
+			currentNode = (DefaultMutableTreeNode)e.nextElement();
+			System.out.println("adding " + phoneNumber + " to " + currentNode);
+			
+			if(currentNode.isLeaf())
+			{
+				list = (ArrayList)currentNode.getUserObject();
+				list.add(phoneNumber);
+			}
+			else
+			{
+				// find the child of this node that is the
+				// ancestor of dest, so we know who to point to
+				int i = 0;
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode)currentNode.getChildAt(i);
+				while(!child.isNodeDescendant(dest) && i < currentNode.getChildCount())
+				{
+					++i;
+					child = (DefaultMutableTreeNode)currentNode.getChildAt(i);
+				}
+				
+				if(i == currentNode.getChildCount())
+					return false;
+				else
+				{
+					map = (HashMap)currentNode.getUserObject();
+					map.put(phoneNumber, i);
+				}
+			}
+		}
+		
+		return true;
 	}
 }

@@ -49,4 +49,23 @@ public class TreeStructure
 	{
 		return top;
 	}
+	
+	// this is for testing
+	public DefaultMutableTreeNode find(int phoneNumber)
+	{
+		DefaultMutableTreeNode node = top;
+		
+		// follow pointers down from the root
+		while(!node.isLeaf())
+		{
+			HashMap map = (HashMap)node.getUserObject();
+			
+			if(map.get(phoneNumber) == null)
+				return null;
+			else
+				node = (DefaultMutableTreeNode)node.getChildAt((Integer)map.get(phoneNumber));
+		}
+		
+		return node;
+	}
 }
