@@ -20,11 +20,11 @@ public class TreeStructure
 	}
 	
 	// recursively populates the subtree starting at this node,
-	// with each node having a random number of children between 1 and 5,
+	// with each node having a random number of children between 2 and 5,
 	// until targetHieght number of levels have been built
 	public void createChildrenFor(DefaultMutableTreeNode node)
 	{
-		long numOfChildren = 1 + Math.round(Math.random() * 4);
+		long numOfChildren = 2 + Math.round(Math.random() * 3);
 		
 		for(int i = 0; i < numOfChildren; ++i)
 		{
