@@ -4,13 +4,11 @@ import javax.swing.tree.*;
 public class TreeStructure
 {
 	private int targetHeight;
-	private int targetWidth;
 	private DefaultMutableTreeNode top;
 	
-	public TreeStructure(int h, int w)
+	public TreeStructure(int h)
 	{
 		targetHeight = h;
-		targetWidth = w;
 
 		// create the root node
 		top = new DefaultMutableTreeNode();
@@ -22,11 +20,13 @@ public class TreeStructure
 	}
 	
 	// recursively populates the subtree starting at this node,
-	// with each node having targetWidth number of children, until
-	// targetHieght number of levels have been built
+	// with each node having a random number of children between 1 and 5,
+	// until targetHieght number of levels have been built
 	public void createChildrenFor(DefaultMutableTreeNode node)
 	{
-		for(int i = 0; i < targetWidth; ++i)
+		long numOfChildren = 1 + Math.round(Math.random() * 4);
+		
+		for(int i = 0; i < numOfChildren; ++i)
 		{
 			DefaultMutableTreeNode newNode = new DefaultMutableTreeNode();
 			node.add(newNode);
@@ -48,24 +48,5 @@ public class TreeStructure
 	public DefaultMutableTreeNode getTop()
 	{
 		return top;
-	}
-	
-	// this is for testing
-	public DefaultMutableTreeNode find(int phoneNumber)
-	{
-		DefaultMutableTreeNode node = top;
-		
-		// follow pointers down from the root
-		while(!node.isLeaf())
-		{
-			HashMap map = (HashMap)node.getUserObject();
-			
-			if(map.get(phoneNumber) == null)
-				return null;
-			else
-				node = (DefaultMutableTreeNode)node.getChildAt((Integer)map.get(phoneNumber));
-		}
-		
-		return node;
 	}
 }

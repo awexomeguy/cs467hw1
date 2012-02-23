@@ -3,9 +3,9 @@ import javax.swing.tree.*;
 
 public class PointerTree extends TreeStructure
 {
-	public PointerTree(int h, int w)
+	public PointerTree(int w)
 	{
-		super(h, w);
+		super(w);
 		fillLeaves();
 		fillInternalNodes();
 	}	
@@ -22,8 +22,10 @@ public class PointerTree extends TreeStructure
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode)e.nextElement();
 			if(node.isLeaf())
 			{
+				long numberCount = 1 + Math.round(Math.random() * 4);
 				ArrayList phoneNumbers = new ArrayList();
-				for(int i = 0; i < 3; ++i, ++j)
+				
+				for(int i = 0; i < numberCount; ++i, ++j)
 					phoneNumbers.add(j);
 				
 				node.setUserObject(phoneNumbers);
@@ -198,5 +200,24 @@ public class PointerTree extends TreeStructure
 		}
 		
 		return true;
+	}
+	
+	// this is for testing
+	public DefaultMutableTreeNode find(int phoneNumber)
+	{
+		DefaultMutableTreeNode node = getTop();
+		
+		// follow pointers down from the root
+		while(!node.isLeaf())
+		{
+			HashMap map = (HashMap)node.getUserObject();
+			
+			if(map.get(phoneNumber) == null)
+				return null;
+			else
+				node = (DefaultMutableTreeNode)node.getChildAt((Integer)map.get(phoneNumber));
+		}
+		
+		return node;
 	}
 }

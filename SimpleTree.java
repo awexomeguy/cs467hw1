@@ -13,31 +13,9 @@ public class SimpleTree extends JFrame {
    // WindowUtilities.setNativeLookAndFeel();
     //addWindowListener(new ExitListener());
     Container content = getContentPane();
-    Object[] hierarchy =
-      { "phoneLocation",
-        new Object[] { "region1",
-              new Object[] { "cell1",
-                             "298-112-8786",
-                             "298-112-8222",
-                             "298-112-2342"},
-                            
-                        },
-        new Object[] { "region2",
-                       new Object[] { "cell1",
-                                      "573-321-3511",
-                                      "573-321-9348",
-                                      "573-321-9832"},
-                       new Object[] { "cell2",
-                                      "573-224-3545",
-                                      "573-224-2312"},
-                       new Object[] { "cell3",
-                                      "573-876-3539",
-                                      "573-876-1111",
-                                      "573-876-3243",
-                                      "573-876-4352"}
-                     }
-        };
-    DefaultMutableTreeNode root = processHierarchy(hierarchy);
+    
+	PointerTree pTree = new PointerTree(3);
+    DefaultMutableTreeNode root = pTree.getTop();
     JTree tree = new JTree(root);
     content.add(new JScrollPane(tree), BorderLayout.CENTER);
     setSize(275, 300);
