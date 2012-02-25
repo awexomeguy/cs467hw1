@@ -31,21 +31,6 @@ public class WorkingTree extends JFrame {
 * and make them child nodes of the first one. The process is
 * repeated recursively for entries that are arrays.
 */
-   
-  private DefaultMutableTreeNode processHierarchy(Object[] hierarchy) {
-    DefaultMutableTreeNode node =
-      new DefaultMutableTreeNode(hierarchy[0]);
-    DefaultMutableTreeNode child;
-    for(int i=1; i<hierarchy.length; i++) {
-      Object nodeSpecifier = hierarchy[i];
-      if (nodeSpecifier instanceof Object[]) // Ie node with children
-        child = processHierarchy((Object[])nodeSpecifier);
-      else
-        child = new DefaultMutableTreeNode(nodeSpecifier); // Ie Leaf
-      node.add(child);
-    }
-    return(node);
-  }
 }
 
 
