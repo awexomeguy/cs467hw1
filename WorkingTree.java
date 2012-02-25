@@ -25,12 +25,6 @@ public class WorkingTree extends JFrame {
     Thread.sleep(10000);
     pTree.move(13, pTree.find(13), pTree.find(1));
   }
-
-  /** Small routine that will make node out of the first entry
-* in the array, then make nodes out of subsequent entries
-* and make them child nodes of the first one. The process is
-* repeated recursively for entries that are arrays.
-*/
 }
 
 
