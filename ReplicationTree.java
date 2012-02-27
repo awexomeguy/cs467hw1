@@ -78,7 +78,7 @@ class ValueReplicationTree extends TreeStructure {
         callsByNumber = new HashMap();
         // intialize the tallys
         for (int i = 0; i < MAX_NUMBER_OF_PHONES; i++) {
-            moveTally[i] = 0;
+            moveTally[i] = 1;//initial deployment as first move
             replicaTally[i] = 0;
         }
     }
