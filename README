@@ -19,7 +19,7 @@ that stores the locations of phones 7 and 12.
 [7,8] is a unique data object that is as distinct as if we have called that leaf "cell z."
 
 PointerTree is the implementation of the hierarchical location management tree using pointers.
-Pointers are represented by integers 0, 1, 2, 3 ... to refer to the first child, second child, third child of the node.
+Pointers are represented by integers 0, 1, 2, 3 ... to refer to the first child, second child, and third child of the node.
 So if an internal node of a tree has a heading like {1=0, 5=1, 6=2} means phone number 1 is in the first child node, 
 5 is in the second child and 6 is in the third child.
 
