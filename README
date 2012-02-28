@@ -11,6 +11,7 @@ So if a leaf has three phone numbers, say 2, 3, and 4, then this leaf is represe
 And [2,3,4] would be used to represent the actuall location of the phones 2, 3, and 4.  
 So whenever you see [...] just be aware that it is refering to a cell. 
 
+ValueTree is the implementation of the hierarchical location management tree using real locations.
 So if an internal node has this heading {7=[7,8],12=[12]} that means this internal node has a map 
 that stores the locations of phones 7 and 12.  
 7's location is cell [7,8] and 12's location is [12]. 
@@ -18,7 +19,9 @@ that stores the locations of phones 7 and 12.
 [7,8] is a unique data object that is as distinct as if we have called that leaf "cell z."
 
 PointerTree is the implementation of the hierarchical location management tree using pointers.
-ValueTree is the implementation of the hierarchical location management tree using real locations.
+Pointers are represented by integers 0, 1, 2, 3 ... to refer to the first child, second child, third child of the node.
+So if an internal node of a tree has a heading like {1=0, 5=1, 6=2} means phone number 1 is in the first child node, 
+5 is in the second child and 6 is in the third child.
 
 For ReplicationTree, the user is encouraged to activate multiple calls to see the effects of replication, 
 as replication only happens when the local call to move ratio reaches a certain point.  
