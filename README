@@ -32,6 +32,7 @@ torn down when calls between that cell and number start to decline.
  
 For simulation comparison, each call or move would generate its search cost and update cost.  
 
-We also has a the capability for making a large number of calls by randomly generated numbers. 
+We also has a the capability for making a large number of calls or moves with randomly generated phone numbers. 
+User needs to enter the number of runs they desire in the first field (source) on the interface.
 Culmulative search cost and update cost will be calculated.
 
