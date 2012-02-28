@@ -40,7 +40,7 @@ User needs to enter the number of runs they desire in the first field (source) o
 Culmulative search cost and update cost will be calculated.
 
 To compile:
-put all source files and .html files intop one directory
+extract all files from the .zip file into one directory
 on the command line, use the command
  javac *.java
 to produce all the executable .class files
