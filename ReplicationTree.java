@@ -29,50 +29,6 @@ public class ReplicationTree extends JFrame {
     }
 }
 
-class TreeStructure {
-    private int targetHeight;
-    private DefaultMutableTreeNode top;
-
-    public TreeStructure(int h) {
-        targetHeight = h;
-
-        // create the root node
-        top = new DefaultMutableTreeNode();
-
-        System.out.println("created the tree");
-
-        // recursively build the tree from the root
-        createChildrenFor(top);
-    }
-
-    // recursively populates the subtree starting at this node,
-    // with each node having a random number of children between 1 and 3,
-    // until targetHieght number of levels have been built
-    public void createChildrenFor(DefaultMutableTreeNode node) {
-        long numOfChildren = 1 + Math.round(Math.random());
-
-        for (int i = 0; i < numOfChildren; ++i) {
-            DefaultMutableTreeNode newNode = new DefaultMutableTreeNode();
-            node.add(newNode);
-        }
-
-        if (node.getLevel() < (targetHeight - 1))
-            for (int n = 0; n < node.getChildCount(); ++n)
-                createChildrenFor((DefaultMutableTreeNode) node.getChildAt(n));
-    }
-
-    // prints out the hierarchy of the tree on the screen
-    public void printTreeStartingAt(DefaultMutableTreeNode node) {
-        Enumeration e = node.breadthFirstEnumeration();
-        for (; e.hasMoreElements();)
-            System.out.println(e.nextElement());
-    }
-
-    public DefaultMutableTreeNode getTop() {
-        return top;
-    }
-}
-
 class ValueReplicationTree extends TreeStructure {
     public ValueReplicationTree(int w) {
         super(w);
@@ -318,7 +274,12 @@ class ValueReplicationTree extends TreeStructure {
        
         ArrayList list;
         HashMap map;
+
         ArrayList replicaSites;
+		
+		// if dest or source or null, stop here
+		if(source == null || dest == null)
+			return false;
 
         // check that the number is in source. If it is not
         // in source, do not proceed with the move
@@ -331,6 +292,7 @@ class ValueReplicationTree extends TreeStructure {
         if (source == dest)
             return true;
 
+        System.out.println(phoneNumber + " has moved from " + source + " to " + dest);
         // delete all entries for this phone number
         // between source and root
 
@@ -369,8 +331,7 @@ class ValueReplicationTree extends TreeStructure {
                 updateCounter++;
             }
         }
-       
-        System.out.println(phoneNumber + " has moved from " + source + " to " + dest);
+  
         moveTally[phoneNumber]++;
         System.out.println(phoneNumber + " has moved " + (moveTally[phoneNumber]-1) + " times");
         //change all replication sites's data to reflect this change
@@ -382,12 +343,9 @@ class ValueReplicationTree extends TreeStructure {
                 localMap.remove(phoneNumber);
                 localMap.put(phoneNumber, dest);   
                 System.out.println("Update " + phoneNumber +"'s replication at " + node);
+        }    
         }
-           
-        }
-       
-
-        return true;
+               return true;
     }
 
     // this is for testing

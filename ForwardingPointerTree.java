@@ -198,6 +198,10 @@ public class ForwardingPointerTree extends TreeStructure
 		ArrayList list;
 		HashMap map;
 		
+		// if dest or source or null, stop here
+		if(source == null || dest == null)
+			return false;
+		
 		// check that the number is in source. If it is not
 		// in source, do not proceed with the move
 		list = (ArrayList)source.getUserObject();
