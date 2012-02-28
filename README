@@ -25,6 +25,10 @@ as replication only happens when the local call to move ratio reaches a certain 
 User is also encouraged to move a phone to see how replication sites are also updated.  
 We can also change S_max, S_min, N_max and L to manipulate the replication 
 (this part is done in code but user is not given a chance to change these in graphical interface).
+
+For ForwardingPointerTree, the user is encouraged to activate multiple calls to see the effects of forwarding pointers.
+A forwarding pointer is created when the number of calls from a certain cell to a number is high, and the pointer gets
+torn down when calls between that cell and number start to decline.
  
 For simulation comparison, each call or move would generate its search cost and update cost.  
 
