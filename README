@@ -39,3 +39,11 @@ We also has a the capability for making a large number of calls or moves with ra
 User needs to enter the number of runs they desire in the first field (source) on the interface.
 Culmulative search cost and update cost will be calculated.
 
+To compile:
+put all source files and .html files intop one directory
+on the command line, use the command
+ javac *.java
+to produce all the executable .class files
+
+To run:
+open any of the .html files in a browser
