@@ -14,15 +14,18 @@ public class ReplicationTree extends JFrame {
         // addWindowListener(new ExitListener());
         Container content = getContentPane();
 
-        ValueReplicationTree vpTree = new ValueReplicationTree(4);
+        ValueReplicationTree vpTree = new ValueReplicationTree(6);
         DefaultMutableTreeNode root = vpTree.getTop();
         JTree tree = new JTree(root);
         content.add(new JScrollPane(tree), BorderLayout.CENTER);
         setSize(275, 300);
         setVisible(true);
-        vpTree.call(vpTree.find(2), 10);
-        // Thread.sleep(10000);
-        // vpTree.move(13, vpTree.find(13), vpTree.find(1));
+
+        vpTree.simulation(4);
+
+        System.out.println("search cost is " + vpTree.searchCounter);
+        System.out.println("update cost is " + vpTree.updateCounter);
+        System.out.println("program finished.");
     }
 }
 
@@ -76,11 +79,14 @@ class ValueReplicationTree extends TreeStructure {
         fillLeaves();
         fillInternalNodes();
         callsByNumber = new HashMap();
+        replicaTally = new HashMap();
         // intialize the tallys
         for (int i = 0; i < MAX_NUMBER_OF_PHONES; i++) {
-            moveTally[i] = 1;//initial deployment as first move
-            replicaTally[i] = 0;
+            moveTally[i] = 1; //consider the initial deployment the first move
         }
+        searchCounter = 0;
+        updateCounter=0;
+       
     }
 
     // this will give each leaf node in the tree a list of phone numbers
@@ -140,9 +146,14 @@ class ValueReplicationTree extends TreeStructure {
     // number in question
     public DefaultMutableTreeNode call(DefaultMutableTreeNode startingNode,
             int phoneNumber) {
+       
+        if(startingNode==null) {
+            System.out.println("calling number doesn't exit.");
+            return null;
+        }
         System.out.println("a phone in " + startingNode + " wants to call "
                 + phoneNumber);
-        System.out.println("starting call at: " + startingNode);
+        //System.out.println("starting call at: " + startingNode);
 
         // first search the same cell, if found then just return the local cell
         ArrayList localNumbers = (ArrayList) startingNode.getUserObject();
@@ -157,13 +168,14 @@ class ValueReplicationTree extends TreeStructure {
         do {
             currentNode = (DefaultMutableTreeNode) currentNode.getParent();
             map = (HashMap) currentNode.getUserObject();
-            System.out.println("moving up to " + currentNode);
+            //System.out.println("moving up to " + currentNode);
+            searchCounter++;
         } while (!map.containsKey(phoneNumber) && currentNode != getTop());
 
         // if the number is still not found, we assume this means we hit
         // the top of the tree and return failure
         if (!map.containsKey(phoneNumber)) {
-            System.out.println("This number does not exist.");
+            System.out.println("The number you are trying to reach does not exist.");
             return null;
         } else {
             // if we are here, it means we have found the number and can
@@ -171,8 +183,8 @@ class ValueReplicationTree extends TreeStructure {
             map = (HashMap) currentNode.getUserObject();
             DefaultMutableTreeNode found = currentNode;
             currentNode = (DefaultMutableTreeNode) map.get(phoneNumber);
-            System.out.println("moving down to " + currentNode);
-
+            //System.out.println("moving down to " + currentNode);
+       
             // just to make sure, check the resulting node to see if it
             // has the phone number we want (should always happen unless
             // something outside this object modified the tree)
@@ -197,7 +209,8 @@ class ValueReplicationTree extends TreeStructure {
         // internal node. Higher level internal nodes' cellTotal
         // is the sum of its children
         int cellTotal = 0;
-
+        ArrayList replicaSites;
+       
         // first calculate how the most recent call changes LCMR
 
         // nobody called this number yet
@@ -210,18 +223,19 @@ class ValueReplicationTree extends TreeStructure {
             DefaultMutableTreeNode currentNode = callerCell;
 
             while (currentNode != numberFoundAt) {
-                System.out.println("updating total number of calls to "
-                        + receiverNumber + " from " + currentNode);
+                //System.out.println("updating total number of calls to "
+                    //    + receiverNumber + " from " + currentNode);
                 callsByNode.put(currentNode, 1);
                 currentNode = (DefaultMutableTreeNode) currentNode.getParent();
+                updateCounter++;
             }
             callsByNumber.put(receiverNumber, callsByNode);
         } else {// calls already made to this number
             HashMap callsByNode = (HashMap) callsByNumber.get(receiverNumber);
             DefaultMutableTreeNode currentNode = callerCell;
             while (currentNode != numberFoundAt) {
-                System.out.println("updating total calls to " + receiverNumber
-                        + " from " + currentNode);
+                //System.out.println("updating total calls to " + receiverNumber
+                    //    + " from " + currentNode);
                 if (callsByNode.get(currentNode) == null)
                     callsByNode.put(currentNode, 1);
                 else {
@@ -234,6 +248,7 @@ class ValueReplicationTree extends TreeStructure {
                     if (!(currentNode.isLeaf())) { // don't replicate at
                         // leaf
                         if ((cellTotal / moveTally[receiverNumber]) > S_MAX) {
+                            System.out.println("LCMR is bigger than S_MAX");
                             // replicate receiverNumber at the current node
 
                             System.out.println("replicating " + receiverNumber
@@ -241,24 +256,47 @@ class ValueReplicationTree extends TreeStructure {
 
                             HashMap map = (HashMap) currentNode.getUserObject();
                             map.put(receiverNumber, receiverCell);
-                            replicaTally[receiverNumber]++;
+                            //update replicaTally
+                           
+                            if(replicaTally.get(receiverNumber) == null) //this is the first time replica is created
+                                replicaSites = new ArrayList();
+                            else
+                                replicaSites = (ArrayList) replicaTally.get(receiverNumber);
+                            replicaSites.add(currentNode);
+                            replicaTally.put(receiverNumber, replicaSites);
                         } else if ((cellTotal / moveTally[receiverNumber]) > S_MIN) {
                             // check node level, which is the number of levels
                             // above the current node
                             // and check how many times this number has been
                             // replicated
-                            if ((currentNode.getLevel() > L)
-                                    && (replicaTally[receiverNumber] < N_MAX)) {
-                                // replicate
-                                HashMap map = (HashMap) currentNode
-                                        .getUserObject();
-                                map.put(receiverNumber, receiverCell);
-                                replicaTally[receiverNumber]++;
+                           
+                            System.out.println("LCMR is in between S_MAX and S_MIN with " + receiverNumber
+                                    + " at " + currentNode);
+                            if (currentNode.getLevel() > L){
+                                System.out.println("The current node is " + currentNode.getLevel() + " levels from the top.");
+                                           
+                                if(replicaTally.get(receiverNumber) == null) //this is the first time replica is created
+                                    replicaSites = new ArrayList();
+                                else
+                                    replicaSites = (ArrayList) replicaTally.get(receiverNumber);
+                                if ((replicaSites.size() < N_MAX))  {
+                                    // replicate   
+                                    System.out.println(receiverNumber + " has been replicated " + replicaSites.size()+ " times before.");
+                                    System.out.println("replicating " + receiverNumber
+                                            + " at " + currentNode);
+                                    HashMap map = (HashMap) currentNode
+                                            .getUserObject();
+                                    map.put(receiverNumber, receiverCell);
+                                    replicaSites.add(currentNode);
+                                    replicaTally.put(receiverNumber, replicaSites);
+                               
+                                }
                             }
                         }
                     }
                 }
                 currentNode = (DefaultMutableTreeNode) currentNode.getParent();
+                updateCounter++;
             }// end of making replication, if warranted, on each relevant node
         }
     }
@@ -267,8 +305,20 @@ class ValueReplicationTree extends TreeStructure {
     // a given destination cell
     public boolean move(int phoneNumber, DefaultMutableTreeNode source,
             DefaultMutableTreeNode dest) {
+       
+        if(source==null) {
+            System.out.println("Move's source location doesn't exit.");
+            return false;
+        }
+        if(dest==null) {
+            System.out.println("Move's Destination location doesn't exist.");
+            return false;
+        }
+       
+       
         ArrayList list;
         HashMap map;
+        ArrayList replicaSites;
 
         // check that the number is in source. If it is not
         // in source, do not proceed with the move
@@ -289,8 +339,7 @@ class ValueReplicationTree extends TreeStructure {
 
         for (int i = 0; i < path.length; ++i) {
             currentNode = (DefaultMutableTreeNode) path[i];
-            System.out.println("removing " + phoneNumber + " from "
-                    + currentNode);
+        //    System.out.println("removing " + phoneNumber + " from " + currentNode);
 
             if (currentNode.isLeaf()) {
                 list = (ArrayList) currentNode.getUserObject();
@@ -298,6 +347,7 @@ class ValueReplicationTree extends TreeStructure {
             } else {
                 map = (HashMap) currentNode.getUserObject();
                 map.remove(phoneNumber);
+                updateCounter++;
             }
         }
 
@@ -306,7 +356,7 @@ class ValueReplicationTree extends TreeStructure {
 
         for (int i = 0; i < path.length; ++i) {
             currentNode = (DefaultMutableTreeNode) path[i];
-            System.out.println("adding " + phoneNumber + " to " + currentNode);
+        //    System.out.println("adding " + phoneNumber + " to " + currentNode);
 
             if (currentNode.isLeaf()) {
                 list = (ArrayList) currentNode.getUserObject();
@@ -316,8 +366,26 @@ class ValueReplicationTree extends TreeStructure {
                 // maps to its current location (dest)
                 map = (HashMap) currentNode.getUserObject();
                 map.put(phoneNumber, dest);
+                updateCounter++;
             }
         }
+       
+        System.out.println(phoneNumber + " has moved from " + source + " to " + dest);
+        moveTally[phoneNumber]++;
+        System.out.println(phoneNumber + " has moved " + (moveTally[phoneNumber]-1) + " times");
+        //change all replication sites's data to reflect this change
+        if(replicaTally.get(phoneNumber)!=null){
+            replicaSites = (ArrayList)replicaTally.get(phoneNumber);
+            for (int i=0; i<replicaSites.size(); i++){
+                DefaultMutableTreeNode node =(DefaultMutableTreeNode)replicaSites.get(i);
+                HashMap localMap = (HashMap)node.getUserObject();
+                localMap.remove(phoneNumber);
+                localMap.put(phoneNumber, dest);   
+                System.out.println("Update " + phoneNumber +"'s replication at " + node);
+        }
+           
+        }
+       
 
         return true;
     }
@@ -331,20 +399,47 @@ class ValueReplicationTree extends TreeStructure {
         return node;
     }
 
+    public void simulation(int times) {
+        //find largest phone number for use of simulation
+        DefaultMutableTreeNode root = getTop();
+        DefaultMutableTreeNode lastleaf = root.getLastLeaf();
+        ArrayList numbers = (ArrayList)lastleaf.getUserObject();
+        int largestNumber = 0;
+        for (int i= 0; i<numbers.size(); i++)
+            largestNumber = (Integer)numbers.get(i);
+
+        //for simulating random number of calls
+        for (int i=0; i < times; i++){
+            if (Math.random()>=0.5) {
+                int calling = (int)Math.round((Math.random()*largestNumber));
+                int receiving = (int)Math.round((Math.random()*largestNumber));
+                call(find(calling), receiving);
+            }
+            else {
+                int moving = (int)Math.round((Math.random()*largestNumber));
+                int joining = (int)Math.round((Math.random()*largestNumber));
+                move(moving, find(moving), find(joining));
+            }
+        }
+}
     private static final int MAX_NUMBER_OF_PHONES = 1000;
     private static final int S_MIN = 2; // LCMR below this no replication will
     // carry out
-    private static final int S_MAX = 4; // LCMR higer than this will trigger
+    private static final int S_MAX = 5; // LCMR higer than this will trigger
     // replication
-    private static final int N_MAX = 50; // maximum number of replicas per user
-    private static final int L = 20; // maximum level of hierarcy replicas can be
+    private static final int N_MAX = 20; // maximum number of replicas per phone number
+    private static final int L = 2; // maximum level of hierarchy replicas can be
     // placed
     // mapping all phone numbers to a corresponding callsByNode, which itself is
     // a map
     private HashMap callsByNumber;
-
+   
+    // keep track of how many replicas a number has
+    private HashMap replicaTally;
     // keep track of moves by a particular phone
     private int moveTally[] = new int[MAX_NUMBER_OF_PHONES];
-    // keep track of how many replicas a number has
-    private int replicaTally[] = new int[MAX_NUMBER_OF_PHONES];
+   
+    //the counters are for cost comparisons
+    int searchCounter;
+    int updateCounter;
 }

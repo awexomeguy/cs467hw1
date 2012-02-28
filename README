@@ -1,0 +1,21 @@
+Our mobile and sensor network is represented by a JTree.
+
+The tree's internal nodes are represented by folder symbols, and the leaf nodes are represented by file symbols. 
+
+The content of each node of the tree is listed right next to it. 
+
+Each leaf represent one cell (or base station) in a sensor network.  
+
+Each leaf is identified by a name that reflects its content. So if a leaf has three phone numbers, say 2, 3, and 4, then this leaf is represented by the name: [2,3,4]. And [2,3,4] would be used to represent the actuall location of the phones 2, 3, and 4.  So whenever you see [...] just be aware that it is refering to a cell. 
+
+So if an internal node has this heading {7=[7,8],12=[12]} that means this internal node has a map that stores the locations of phones 7 and 12.  7's location is cell [7,8] and 12's location is [12]. "7's location is [7,8]" may look like there is no real location information, but internally, [7,8] is a unique data object that is as distinct as if we have called that leaf "cell z."
+
+PointerTree is the implementation of the hierarchical location management tree using pointers.
+ValueTree is the implementation of the hierarchical location management tree using real locations.
+
+For ReplicationTree, the user is encouraged to activate multiple calls to see the effects of replication, as replication only happens when the local call to move ratio reaches a certain point.  User is also encouraged to move a phone to see how replication sites are also updated.  We can also change S_max, S_min, N_max and L to manipulate the replication (this part is done in code but user is not given a chance to change these in graphical interface).
+ 
+For simulation comparison, each call or move would generate its search cost and update cost.  
+
+We also has a the capability for making a large number of calls by randomly generated numbers. Culmulative search cost and update cost will be calculated.
+
